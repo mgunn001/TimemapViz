@@ -1321,6 +1321,9 @@ TimeMap.prototype.createScreenshotForMemento = function (memento, callback) {
       ConsoleLogIfRequired(err)
       callback('Screenshot failed!')
     } else {
+      if (!fs.existsSync(__dirname+"/assets/screenshots")){
+          fs.mkdirSync(__dirname+"/assets/screenshots");
+      }
       fs.chmodSync('./'+screenshotsLocation + filename, '755')
       im.convert(['./'+screenshotsLocation + filename, '-thumbnail', '200',
             './'+screenshotsLocation + (filename.replace('.png', '_200.png'))],
