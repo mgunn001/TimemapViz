@@ -1,12 +1,12 @@
 {
-  "name": "ArchiveThumbnails",
+  "name": "tmvis",
   "version": "1.0.0",
   "description": "An implementation for Ahmed AlSum's \"Thumbnail Summarization Techniques for Web Archives\"",
-  "repository": "https://github.com/machawk1/ArchiveThumbnails",
-  "license": "GPL-2.0",
-  "author": "Mat Kelly <mkelly@cs.odu.edu> (http://www.cs.odu.edu/~mkelly)",
-  "start": "node AlSummarization.js",
-  "bugs": "https://github.com/machawk1/ArchiveThumbnails/issues",
+  "repository": "https://github.com/mgunn001/tmvis",
+  "license": "MIT",
+  "author": "Maheedhar Gunnam <mgunn001@odu.edu> (http://www.cs.odu.edu/~mgunnam)",
+  "start": "node AlSummarization_tmvis.js",
+  "bugs": "https://github.com/mgunn001/tmvis/issues",
   "dependencies": {
     "express": "*",
     "connect": "*",
