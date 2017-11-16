@@ -363,58 +363,6 @@ function PublicEndpoint () {
         }
 
       )
-    } else if (strategy === 'random') {
-      t.setupWithURIR(response, query['URI-R'], function selectRandomMementosFromTheTimeMap () {
-        var numberOfMementosToSelect = 16 // TODO: remove magic number
-        t.supplyChosenMementosBasedOnUniformRandomness(generateThumbnailsWithSelectedMementos, numberOfMementosToSelect)
-        setTimeout(function () {
-          var client = new faye.Client(notificationServer)
-
-          client.publish('/' + md5(t.originalURI), {
-            'uriM': 'done'
-          })
-        }, 2000)
-      })
-
-    } else if (strategy === 'temporalInterval') {
-      t.setupWithURIR(response, query['URI-R'], function selectOneMementoForEachMonthPresent () { // TODO: refactor to have fewer verbose callback but not succumb to callback hell
-        t.supplyChosenMementosBasedOnTemporalInterval(generateThumbnailsWithSelectedMementos, 16) // TODO: remove magic number, current scope issues with associating with callback
-        setTimeout(function () {
-          var client = new faye.Client(notificationServer)
-
-          client.publish('/' + md5(t.originalURI), {
-            'uriM': 'done'
-          })
-        }, 2000)
-
-      })
-    } else if (strategy === 'interval') {
-      t.setupWithURIR(response, query['URI-R'], function selectMementosBasedOnInterval () { // TODO: refactor to have fewer verbose callback but not succumb to callback hell
-        t.supplyChosenMementosBasedOnInterval(generateThumbnailsWithSelectedMementos, Math.floor(t.mementos.length / 16)) // TODO: remove magic number, current scope issues with associating with callback
-      })
-
-      setTimeout(function () {
-        var client = new faye.Client(notificationServer)
-
-        client.publish('/' + md5(t.originalURI), {
-          'uriM': 'done'
-        })
-      }, 2000)
-    }
-
-    // TODO: break apart callback hell
-    function generateThumbnailsWithSelectedMementos () {
-      // suboptimal route but reference to t must be preserved
-      // TODO: move this to TimeMap prototype
-      t.supplySelectedMementosAScreenshotURI(strategy, function (callback) {
-        t.printMementoInformation(response, function () {
-          t.createScreenshotsForMementos(
-            function () {
-              ConsoleLogIfRequired('Done creating screenshots')
-            }
-          )
-        })
-      })
     }
   }
 }
@@ -693,7 +641,11 @@ function getTimemapGodFunctionForAlSummarization (uri, response) {
             callback('')
           }else{
             ConsoleLogIfRequired('The page you requested has not been archived in Archive-It.')
-             process.exit(-1)
+             //process.exit(-1)
+             response.write('The page you requested has not been archived in Archive-It.')
+             response.end()
+               return
+
           }
         })
       })
@@ -703,6 +655,9 @@ function getTimemapGodFunctionForAlSummarization (uri, response) {
         ConsoleLogIfRequired(e)
         if (e.message === 'connect ETIMEDOUT') { // Error experienced when IA went down on 20141211
           ConsoleLogIfRequired('Hmm, the connection timed out. Internet Archive might be down.')
+          response.write('Hmm, the connection timed out. Internet Archive might be down.')
+          response.end()
+            return
         }
       })
 
@@ -812,95 +767,6 @@ function getTimemapGodFunctionForAlSummarization (uri, response) {
 /*****************************************
    // SUPPLEMENTAL TIMEMAP FUNCTIONALITY
 ***************************************** */
-
-/**
- * HTML to return back as user interface to client
- * @param callback The function to call once this function has completed executed, invoked by caller
- */
-TimeMap.prototype.printMementoInformation = function (response, callback, dataReady) {
-  ConsoleLogIfRequired('About to print memento information')
-  var CRLF = '\r\n'
-  var TAB = '\t'
-  var stateInformationString = ''
-
-
-  if (dataReady === false) { // Indicative of the data still loading. Yes, I know it's an abuse of CBs
-    stateInformationString = 'Processing data. This could take a while.'
-  }
-
-
-  var cacheFilePathWithoutDotSlash = (new SimhashCacheFile(uriR,isDebugMode)).path.substr(2)
-
-  var metadata = {
-    'url': uriR,
-    'simhashCacheURI': localAssetServer + cacheFilePathWithoutDotSlash
-  }
-
-
-  // Boo! Node doesn't support ES6 template strings. Have to build the old fashion way
-  var respString =
-`<!DOCTYPE html>
-<html>
-<head>
-<base href="${localAssetServer}" />
-<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-<script src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
-<script src="md5.min.js"></script>
-<!--<script src="gridder/js/jquery.gridder.min.js"></script>-->
-<script src="_js/moment-with-langs.min.js"></script>
-<link rel="stylesheet" type="text/css" href="_css/coverflow.css" />
-<link rel="stylesheet" type="text/css" href="_css/alSummarization.css" />
-<link rel="stylesheet" type="text/css" href="_css/reflection.css" />
-<link rel="stylesheet" type="text/css" href="vis/vis.min.css" />
-<link rel="stylesheet" type="text/css" href="_css/flip.css" />
-<script src="_js/coverflow.min.js"></script>
-<script src="vis/vis.min.js"></script>"
-<script src="support/faye/faye-browser-min.js"></script>
-<script>
-//echo the ports and other endpoint facets for use in util.js
-var thumbnailServicePort = ${thumbnailServicePort}
-var thumbnailServer = '${thumbnailServer}'
-var localAssetServerPort = '${localAssetServerPort}'
-var localAssetServer = '${localAssetServer}'
-var returnedJSON = ${JSON.stringify(this.mementos)}
-var metadata = ${JSON.stringify(metadata)}
-var client = new Faye.Client('${notificationServer}')
-var strategy
-$(document).ready(function () {
-  strategy = $($('body')[0]).data('strategy')
-  setStrategyAndAccessInUI()
-  client.subscribe('/${md5(uriR)}', function (message) {
-   $('#dataState').html(message.uriM)
-   if (strategy == 'alSummarization' && message.uriM === 'done') {
-       conditionallyLoadInterface()
-   } else if (message.uriM === 'done') {
-       displayVisualization()
-       $('#dataState').html('')
-   }
-  })
-})
-</script>
-<script src="${localAssetServer}util.js"></script>
-</head>
-<body data-access="${response.thumbnails.primesource}" data-strategy="${response.thumbnails.strategy}">
-<h1 class="interface">${uriR}</h1>
-<section id="subnav">
-<form method="get" action="/">
- <span><label for="strategy">Strategy:</label><select id="form_strategy" name="strategy"><option value="alSummarization">AlSummarization</option><option value="random">Random</option><option value="interval">Interval</option><option value="temporalInterval">Temporal Interval</option></select></span>
- <input type="hidden" name="URI-R" id="form_urir" value="${decodeURIComponent(uriR)}" />
- <input type="button" value="Go" onclick="buildQuerystringAndGo()"  />
-</form>
-<p id="dataState">${stateInformationString}</p>
-</body>
-</html>`
-  response.write(respString)
-  response.end()
-
-  if (callback) {
-    callback('')
-  }
-}
 
 TimeMap.prototype.calculateSimhashes = function (callback) {
   //ConsoleLogIfRequired("--- By Mahee - For my understanding")
