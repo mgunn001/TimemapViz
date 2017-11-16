@@ -1,7 +1,7 @@
-ArchiveThumbnails
-================
-
-An implementation of Ahmed AlSum's 2014 ECIR paper titled ["Thumbnail Summarization Techniques for Web
+Timemap Visualization
+=====================
+A webservice implementation of ArchiveThumbnails and gets inherited from Mat's(machawk1) work https://github.com/machawk1/ArchiveThumbnails which itself is an implementation of
+implementation of Ahmed AlSum's 2014 ECIR paper titled ["Thumbnail Summarization Techniques for Web
 Archives"](http://www.cs.odu.edu/~mln/pubs/ecir-2014/ecir-2014.pdf) for the Web Archiving Incentive Program for Columbia University Libraries' grant, "Visualizing Digital Collections of Web Archives".
 
 ![Screenshot](_meta/screenshot.png)
@@ -12,17 +12,14 @@ Archives"](http://www.cs.odu.edu/~mln/pubs/ecir-2014/ecir-2014.pdf) for the Web 
 
 ## Running
 
-To execute the code, run `node AlSummarization.js`.
+To execute the code, run `node AlSummarization_tmvis.js`.
 
-To query the server instance generated using your browser visit `http://localhost:15421/?URI-R=http://matkelly.com`, substituting the URI-R to request a different site's summarization. The additional parameters of `access` and `strategy` can be used to change the summarization process, specifying the means of access and the strategy used for summarization (respectively). `access` can be one of `interface`, `embed`, or `wayback`. `strategy` can be `alSummarization`, `random`, `interval`, or `temporalInterval`.
+To query the server instance generated using your browser visit `http://localhost:3000/alsummarizedtimemap/?URI-R=http://4genderjustice.org/&ci=1068&primesource=archiveIt`, substituting the URI-R to request a different site's summarization. The additional parameters of `ci` is used to specify the collection identifier if not specified the argument 'all' is used, `primesource` gets the value of 'archiveIt' or 'internetarchive' as to let the service know which is the primary source.
 
 ### Example URIs
 
-* `http://localhost:15421/?URI-R=http://matkelly.com`
-* `http://localhost:15421/?access=embed&URI-R=http://matkelly.com`
-* `http://localhost:15421/?strategy=random&URI-R=http://matkelly.com`
-* `http://localhost:15421/?access=wayback&strategy=yearly&URI-R=http://matkelly.com`
-* `http://localhost:15421/http://matkelly.com`
+* `http://localhost:3000/alsummarizedtimemap/?URI-R=http://4genderjustice.org/&ci=1068&primesource=archiveIt`
+
 
 ## Running as a Docker Container (experimental)
 
@@ -33,33 +30,33 @@ Running the server in a [Docker](https://www.docker.com/) container can make the
 Clone the repository and change working directory (if not already) then build the image.
 
 ```
-$ git clone https://github.com/machawk1/ArchiveThumbnails.git
-$ cd ArchiveThumbnails
-$ docker image build -t archthumb .
+$ git clone https://github.com/mgunn001/tmvis.git
+$ cd tmvis
+$ docker image build -t timemapvis .
 ```
 
-In the above command `archthumb` is the name of the image which can be anything, but the same needs to be used when running the container instance.
+In the above command `timemapvis` is the name of the image which can be anything, but the same needs to be used when running the container instance.
 
 ### Running Docker Container
 
 ```
-$ docker container run -d -p 15421:15421 -p 15422:15422 -p 1338:1338 archthumb
+docker run -it --rm -v "$PWD":/app -p 3000:3000  timemapvis bash
 ```
 
-In the above command the container is running in detached mode and can be accessed from outside on port `15421` at http://localhost:15421/. If you want to run the service on a different port, say `80` then change `-p 15421:15421` to `-p 80:15421`.
+In the above command the container is running in detached mode and can be accessed from outside on port `3000` at http://localhost:3000/. If you want to run the service on a different port, say `80` then change `-p 3000:3000` to `-p 80:3000`.
 
-In order to persist generated thumbnails, mount a host directory as a volume inside the container by adding `-v /SOME/HOST/DIRECTORY:/app/screenshots` flag when running the container.
+In order to persist generated thumbnails, mount a host directory as a volume inside the container by adding `-v /SOME/HOST/DIRECTORY:/app/assets/screenshots` flag when running the container.
 
 Container is completely transparent from the outside and it will be accessed as if the service is running in the host machine itself.
 
-In case if you want to make changes in the `ArchiveThumbnails` code itself, you might want to run it in the development mode by mounting the code from the host machine inside the container so that changes are reflected immediately, without requiring an image rebuild. Here is a possible workflow:
+In case if you want to make changes in the `tmvis` code itself, you might want to run it in the development mode by mounting the code from the host machine inside the container so that changes are reflected immediately, without requiring an image rebuild. Here is a possible workflow:
 
 ```
-$ git clone https://github.com/machawk1/ArchiveThumbnails.git
-$ cd ArchiveThumbnails
-$ docker image build -t archthumb .
-$ docker container run -it --rm -v "$PWD":/app archthumb npm install
-$ docker container run -it --rm -v "$PWD":/app -p 15421:15421 -p 15422:15422 -p 1338:1338 archthumb
+$ git clone https://github.com/mgunn001/tmvis.git
+$ cd tmvis
+$ docker image build -t timemapvis .
+$ docker container run -it --rm -v "$PWD":/app timemapvis npm install
+$ docker container run -it --rm -v "$PWD":/app -p 3000:3000 timemapvis
 ```
 
 Once the image is built and dependencies are installed locally under the `node_modules` directory of the local clone, only the last command would be needed for continuous development. Since the default container runs under the `root` user, there might be permission related issues on the `npm install` step. If so, then try to manually create the `node_modules` directory and change its permissions to world writable (`chmod -R a+w node_modules`) then run the command to install dependencies again.
@@ -73,3 +70,8 @@ $ docker-compose up -d
 ```
 
 The `docker-compose.yml` file has port mapping as described in the previous section. Additionally it also makes the generated thumbnail persistent on the host machine in the `thumbnails` directory under this checked out code directory. Please feel free to modify or inherit from the `docker-compose.yml` file according to your needs.
+
+
+### Usage of the service
+
+Running this service gives provides an user with the array of JSON object as the response (webservice model), which then has to be visualized with the UI tool deployed at `http://www.cs.odu.edu/~mgunnam/TimeMapVisualisationUI/UIInitialDraft.html`
