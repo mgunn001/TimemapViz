@@ -81,10 +81,29 @@ Running this service gives provides an user with the array of JSON object as the
 
 ##Request format
 ```
-curl http://localhost:3000/alsummarizedtimemap/?URI-R=http://4genderjustice.org/&ci=1068&primesource=archiveIt
+curl -il http://localhost:3000/alsummarizedtimemap/?URI-R=http://4genderjustice.org/&ci=1068&primesource=archiveIt
 ```
 ##Response format
 ```
-
-
+[
+  {
+    "timestamp": 1435787801,
+    "event_series": "Thumbnails",
+    "event_html": "<img src='http://localhost:3001/screenshots/timemapSum_httpwaybackarchiveitorg106820150701215641http4genderjusticeorg.png' width='300px' />",
+    "event_date": "Aug. 01, 2015",
+    "event_display_date": "2015-07-01, 21:56:41",
+    "event_description": "",
+    "event_link": "http://wayback.archive-it.org/1068/20150701215641/http://4genderjustice.org/"
+  },
+  {
+    "timestamp": 1435789960,
+    "event_series": "Non-Thumbnail Mementos",
+    "event_html": "<img src='http://localhost:3001/screenshots/notcaptured.png' width='300px' />",
+    "event_html_similarto": "<img src='http://localhost:3001/screenshots/timemapSum_httpwaybackarchiveitorg106820150701215641http4genderjusticeorg.png' width='300px' />",
+    "event_date": "Aug. 01, 2015",
+    "event_display_date": "2015-07-01, 22:32:40",
+    "event_description": "",
+    "event_link": "http://wayback.archive-it.org/1068/20150701223240/http://4genderjustice.org/"
+  },....
+]
 ```
