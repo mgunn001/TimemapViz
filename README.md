@@ -72,6 +72,10 @@ $ docker-compose up -d
 The `docker-compose.yml` file has port mapping as described in the previous section. Additionally it also makes the generated thumbnail persistent on the host machine in the `thumbnails` directory under this checked out code directory. Please feel free to modify or inherit from the `docker-compose.yml` file according to your needs.
 
 
+### Regarding License
+Though GPL Licensing was used for base (https://github.com/machawk1/ArchiveThumbnails) of this repository, but for this current one MIT license is in place and is changed with the permission from the original author @machawk1.
+
+
 ### Usage of the service
 
-Running this service gives provides an user with the array of JSON object as the response (webservice model), which then has to be visualized with the UI tool deployed at `http://www.cs.odu.edu/~mgunnam/TimeMapVisualisationUI/UIInitialDraft.html`
+Running this service gives provides an user with the array of JSON object as the response (webservice model), which then has to be visualized with the UI tool deployed at http://www.cs.odu.edu/~mgunnam/TimeMapVisualisationUI/UIInitialDraft.html for which the code is available at https://github.com/mgunn001/TimeMapVisualisationUI
