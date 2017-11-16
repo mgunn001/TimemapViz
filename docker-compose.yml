@@ -1,8 +1,6 @@
 thumb:
   build: .
   ports:
-   - "15421:15421"
-   - "15422:15422"
-   - "1338:1338"
+   - "3000:3000"
   volumes:
    - .assets/screenshots:/app/screenshots

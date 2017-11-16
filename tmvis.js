@@ -55,10 +55,10 @@ var webshot = require('webshot') // PhantomJS wrapper
 var argv = require('minimist')(process.argv.slice(2))
 var prompt = require('syncprompt')
 
-var mementoFramework = require('./assets/_js/mementoFramework.js')
+var mementoFramework = require('./assets/js/mementoFramework.js')
 var Memento = mementoFramework.Memento
 var TimeMap = mementoFramework.TimeMap
-var SimhashCacheFile = require('./assets/_js/simhashCache.js').SimhashCacheFile
+var SimhashCacheFile = require('./assets/js/simhashCache.js').SimhashCacheFile
 
 var colors = require('colors')
 var im = require('imagemagick')
@@ -108,6 +108,16 @@ function main () {
                'THUMBNAIL SUMMARIZATION SERVICE\r\n' +
                '*******************************').blue)
   ConsoleLogIfRequired("--By Mahee - for understanding")
+
+  // setting up the folder required
+  if (!fs.existsSync(__dirname+"/assets/screenshots")){
+      fs.mkdirSync(__dirname+"/assets/screenshots");
+  }
+
+  if (!fs.existsSync(__dirname+"/cache")){
+    fs.mkdirSync(__dirname+"/cache");
+  }
+
 
   startLocalAssetServer()  //- Now everything is made to be served from the same port.
   var endpoint = new PublicEndpoint()
@@ -1188,9 +1198,9 @@ TimeMap.prototype.createScreenshotForMemento = function (memento, callback) {
       ConsoleLogIfRequired(err)
       callback('Screenshot failed!')
     } else {
-      if (!fs.existsSync(__dirname+"/assets/screenshots")){
-          fs.mkdirSync(__dirname+"/assets/screenshots");
-      }
+      // if (!fs.existsSync(__dirname+"/assets/screenshots")){
+      //     fs.mkdirSync(__dirname+"/assets/screenshots");
+      // }
       fs.chmodSync('./'+screenshotsLocation + filename, '755')
       im.convert(['./'+screenshotsLocation + filename, '-thumbnail', '200',
             './'+screenshotsLocation + (filename.replace('.png', '_200.png'))],

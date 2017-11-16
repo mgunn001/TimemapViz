@@ -5,10 +5,7 @@ EXPOSE  15421 15422 1338
 WORKDIR /app
 
 RUN     apt-get update && apt-get install -y \
-          curl \
-          git \
           imagemagick \
-          nano \
           nodejs \
           npm \
           phantomjs \
@@ -19,4 +16,4 @@ COPY    ./package.json /app/
 RUN     npm install
 COPY    . /app
 
-CMD     ["node", "AlSummarization_OPT_CLI_JSON.js"]
+CMD     ["node", "tmvis.js"]

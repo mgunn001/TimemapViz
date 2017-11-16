@@ -11,7 +11,7 @@ Archives"](http://www.cs.odu.edu/~mln/pubs/ecir-2014/ecir-2014.pdf) for the Web 
 
 ## Running
 
-To execute the code, run `node AlSummarization_tmvis.js`.
+To execute the code, run `node tmvis.js`.
 
 To query the server instance generated using your browser visit `http://localhost:3000/alsummarizedtimemap/?URI-R=http://4genderjustice.org/&ci=1068&primesource=archiveIt`, substituting the URI-R to request a different site's summarization. The additional parameters of `ci` is used to specify the collection identifier if not specified the argument 'all' is used, `primesource` gets the value of 'archiveIt' or 'internetarchive' as to let the service know which is the primary source.
 
@@ -78,3 +78,13 @@ Though GPL Licensing was used for base (https://github.com/machawk1/ArchiveThumb
 ### Usage of the service
 
 Running this service gives provides an user with the array of JSON object as the response (webservice model), which then has to be visualized with the UI tool deployed at http://www.cs.odu.edu/~mgunnam/TimeMapVisualisationUI/UIInitialDraft.html for which the code is available at https://github.com/mgunn001/TimeMapVisualisationUI
+
+##Request format
+```
+curl http://localhost:3000/alsummarizedtimemap/?URI-R=http://4genderjustice.org/&ci=1068&primesource=archiveIt
+```
+##Response format
+```
+
+
+```

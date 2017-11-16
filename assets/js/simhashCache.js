@@ -8,6 +8,9 @@ function SimhashCacheFile(forUri, isDebugMode){
 
 		this.isDebugMode = isDebugMode
 		//TODO, check if it already exists
+		if (!fs.existsSync(__dirname+"/cache")){
+	    fs.mkdirSync(__dirname+"/cache");
+	}
 		this.path = './cache/simhashes_' + forUri.replace(/[^a-z0-9]/gi, '').toLowerCase();
 		this.timemapSumJsonPath= './cache/timemapsumjson_'+forUri.replace(/[^a-z0-9]/gi, '').toLowerCase();
 		console.log('path is now ' + this.path);
