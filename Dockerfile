@@ -1,7 +1,10 @@
 FROM    ubuntu:16.04
-LABEL   maintainer="Maheedhar Gunnam <mgunnam@cs.odu.edu>"
+LABEL   app.name="TMVis" \
+        app.description="An implementation for Ahmed AlSum's Thumbnail Summarization Techniques for Web Archives." \
+        app.repo.url="https://github.com/oduwsdl/tmvis" \
+        app.maintainer="Maheedhar Gunnam <mgunnam@cs.odu.edu>"
 
-EXPOSE  15421 15422 1338
+EXPOSE  3000
 WORKDIR /app
 
 RUN     apt-get update && apt-get install -y \

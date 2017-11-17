@@ -119,7 +119,7 @@ function main () {
   }
 
 
-  startLocalAssetServer()  //- Now everything is made to be served from the same port.
+  //startLocalAssetServer()  //- Now everything is made to be served from the same port.
   var endpoint = new PublicEndpoint()
 
   //This route is just for testing
@@ -164,18 +164,18 @@ function main () {
 * Create access point for resources local to the interface to be queried. This differs
 *  from handling requests from clients.
 */
-function startLocalAssetServer () {
-  connect().use(
-    serveStatic(
-      __dirname,
-      {'setHeaders': function (res,path) {
-          res.setHeader('Access-Control-Allow-Origin', '*')
-        }
-      }
-    )
-  ).listen(localAssetServerPort)
-  console.log('* ' + ('Local resource (.png,simhashes etc.) server listening on Port ' + localAssetServerPort + '...').red)
-}
+// function startLocalAssetServer () {
+//   connect().use(
+//     serveStatic(
+//       __dirname,
+//       {'setHeaders': function (res,path) {
+//           res.setHeader('Access-Control-Allow-Origin', '*')
+//         }
+//       }
+//     )
+//   ).listen(localAssetServerPort)
+//   console.log('* ' + ('Local resource (.png,simhashes etc.) server listening on Port ' + localAssetServerPort + '...').red)
+// }
 
 
 /**

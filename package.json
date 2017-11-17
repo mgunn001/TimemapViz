@@ -5,11 +5,10 @@
   "repository": "https://github.com/mgunn001/tmvis",
   "license": "MIT",
   "author": "Maheedhar Gunnam <mgunn001@odu.edu> (http://www.cs.odu.edu/~mgunnam)",
-  "start": "node AlSummarization_tmvis.js",
+  "start": "node tmvis.js",
   "bugs": "https://github.com/mgunn001/tmvis/issues",
   "dependencies": {
     "express": "*",
-    "connect": "*",
     "serve-static": "*",
     "step": "*",
     "futures": "*",
@@ -37,20 +36,5 @@
     "gm": "*",
     "phridge": "*",
     "phantom": "*"
-  },
-  "main": "index",
-  "engines": {
-    "node": ">= 0.10.0 <= 0.10.40"
-  },
-  "scripts": {
-    "test": "standard"
-  },
-  "devDependencies": {
-    "chai": "^3.2.0",
-    "jscs": "^1.13.1",
-    "mocha": "0.3.x",
-    "mocha-jscs": "^1.2.0",
-    "should": "^7.0.2",
-    "standard" :"*"
   }
 }
