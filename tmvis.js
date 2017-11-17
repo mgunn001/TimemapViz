@@ -33,32 +33,32 @@ var http = require('http')
 var express = require('express')
 var url = require('url')
 var connect = require('connect')
-var serveStatic = require('serve-static')
+//var serveStatic = require('serve-static')
 // var Step = require('step')
 var async = require('async')
 // var Futures = require('futures')
 var Promise = require('es6-promise').Promise
 var Async = require('async')
 var simhash = require('simhash')('md5')
-var moment = require('moment')
+//var moment = require('moment')
 
-var ProgressBar = require('progress')
+//var ProgressBar = require('progress')
 var phantom = require('node-phantom')
 
 var fs = require('fs')
+var mdr = require('mkdir-recursive')
 var path = require('path')
 var validator = require('validator')
-var underscore = require('underscore')
+//var underscore = require('underscore')
 
 var webshot = require('webshot') // PhantomJS wrapper
 
 var argv = require('minimist')(process.argv.slice(2))
-var prompt = require('syncprompt')
 
-var mementoFramework = require('./lib/js/mementoFramework.js')
+var mementoFramework = require('./lib/mementoFramework.js')
 var Memento = mementoFramework.Memento
 var TimeMap = mementoFramework.TimeMap
-var SimhashCacheFile = require('./lib/js/simhashCache.js').SimhashCacheFile
+var SimhashCacheFile = require('./lib/simhashCache.js').SimhashCacheFile
 
 var colors = require('colors')
 var im = require('imagemagick')
@@ -67,9 +67,8 @@ var rimraf = require('rimraf')
 //var faye = require('faye') // For status-based notifications to client
 
 // Faye's will not allow a URI-* as the channel name, hash it for Faye
-var md5 = require('md5')
+//var md5 = require('md5')
 
-var prompt = require('prompt')
 var zlib = require('zlib')
 var app = express()
 var host = 'http://localhost' // Format: scheme://hostname
@@ -77,7 +76,7 @@ var thumbnailServicePort = argv.p ? argv.p :3000
 var localAssetServerPort = argv.ap ? argv.ap : 3001
 
 var thumbnailServer = host + ':' + thumbnailServicePort + '/'
-var localAssetServer = host + ':' + localAssetServerPort + '/'
+var localAssetServer = host + ':' + thumbnailServicePort + '/static/'
 
 
 var uriR = ''
@@ -108,10 +107,10 @@ function main () {
                'THUMBNAIL SUMMARIZATION SERVICE\r\n' +
                '*******************************').blue)
   ConsoleLogIfRequired("--By Mahee - for understanding")
-  console.log("------------------"+ __dirname);
   // setting up the folder required
   if (!fs.existsSync(__dirname+"/assets/screenshots")){
-      fs.mkdirSync(__dirname+"/assets/screenshots");
+    //fs.mkdirSync(__dirname+"/assets/screenshots");
+    mdr.mkdirSync(__dirname+"/assets/screenshots");
   }
 
   if (!fs.existsSync(__dirname+"/cache")){
@@ -628,6 +627,7 @@ function getTimemapGodFunctionForAlSummarization (uri, response) {
         //  ConsoleLogIfRequired("Data Response from fetchTimeMap:" + buffer)
 
           if (buffer.length > 100) {  // Magic number = arbitrary, has be quantified for correctness
+
             //ConsoleLogIfRequired('Timemap acquired for ' + uri + ' from ' + timemapHost + timemapPath)
             // ConsoleLogIfRequired("-----------ByMahee--------")
             // ConsoleLogIfRequired(buffer)
@@ -718,19 +718,8 @@ function getTimemapGodFunctionForAlSummarization (uri, response) {
           callback('')
         }
     },
-    function (callback) {t.writeThumbSumJSONOPToCache(response,callback)},
+    function (callback) {t.writeThumbSumJSONOPToCache(response,callback)}
 
-
-
-
-
-    /*// function (callback) {calculateCaptureTimeDeltas(callback);},// CURRENTLY UNUSED, this can be combine with previous call to turn 2n-->1n
-    // function (callback) {applyKMedoids(callback);}, // No functionality herein, no reason to call yet
-    function (callback) {t.supplyChosenMementosBasedOnHammingDistanceAScreenshotURI(callback);}, */
-    //function (callback) {t.writeJSONToCache(callback);},
-  /*  function (callback) {t.printMementoInformation(response, callback);},
-    function (callback) {t.createScreenshotsForMementos(callback)}
-    */
   ],
   function (err, result) {
     if (err) {
@@ -784,23 +773,6 @@ TimeMap.prototype.calculateSimhashes = function (callback) {
   //ConsoleLogIfRequired("Inside CalculateSimhashes")
   var theTimeMap = this
   var arrayOfSetSimhashFunctions = []
-  var bar = new ProgressBar('  Simhashing [:bar] :percent :etas', {
-    'complete': '=',
-    'incomplete': ' ',
-    'width': 20,
-    'total': this.mementos.length
-  })
-
-// -- ByMahee -- Ignoring for CLI_JSON
-//  var client = new faye.Client(notificationServer)
-//  ConsoleLogIfRequired("--- By Mahee for understanding -- ")
-//  ConsoleLogIfRequired(client)
-/* commented the below line purposefully to check whether memento fetching isn't working beacuse there are many request made parallely at a time. */
-//  for (var m = 0; m < this.mementos.length; m++) {
-// //  for (var m = 0; m < 5; m++) {
-//     arrayOfSetSimhashFunctions.push(this.mementos[m].setSimhash())
-//     bar.tick(1)
-//   }
 
   // the way to get a damper, just 10 requests at a time.
   async.eachLimit(this.mementos,10, function(curMemento, callback){
@@ -908,13 +880,13 @@ TimeMap.prototype.writeThumbSumJSONOPToCache = function (response,callback) {
     mementoJObj_ForTimeline["timestamp"] = Number(dt)/1000
     if(memento.screenshotURI == null || memento.screenshotURI==''){
       mementoJObj_ForTimeline["event_series"] = "Non-Thumbnail Mementos"
-      mementoJObj_ForTimeline["event_html"] = "<img src='"+localAssetServer+screenshotsLocation+"notcaptured.png' width='300px' />"
-      mementoJObj_ForTimeline["event_html_similarto"] = "<img src='"+localAssetServer+screenshotsLocation+memento.hammingBasisScreenshotURI +"' width='300px' />"
+      mementoJObj_ForTimeline["event_html"] = "<img src='"+localAssetServer+"notcaptured.png' width='300px' />"
+      mementoJObj_ForTimeline["event_html_similarto"] = "<img src='"+localAssetServer+memento.hammingBasisScreenshotURI +"' width='300px' />"
 
     }else{
       var filename = 'timemapSum_' + uri.replace(/[^a-z0-9]/gi, '').toLowerCase() + '.png'  // Sanitize URI->filename
       mementoJObj_ForTimeline["event_series"] = "Thumbnails"
-      mementoJObj_ForTimeline["event_html"] = "<img src='"+localAssetServer+screenshotsLocation+memento.screenshotURI +"' width='300px' />"
+      mementoJObj_ForTimeline["event_html"] = "<img src='"+localAssetServer+memento.screenshotURI +"' width='300px' />"
     }
 
     mementoJObj_ForTimeline["event_date"] =  month_names_short[ parseInt(month)]+". "+date +", "+ dt.getUTCFullYear()
@@ -988,137 +960,6 @@ TimeMap.prototype.supplySelectedMementosAScreenshotURI = function (strategy,call
   }
 }
 
-/**
-* Select random mementos from the TimeMap up to a specified quantity
-* @param callback The next procedure to execution when this process concludes
-* @param numberOfMementosToChoose The count threshold before the selection strategy has been satisfied
-*/
-TimeMap.prototype.supplyChosenMementosBasedOnUniformRandomness = function (callback, numberOfMementosToChoose) {
-  var _this = this
-  if (numberOfMementosToChoose > this.mementos.length) {
-    ConsoleLogIfRequired('Number to choose is greater than number existing.')
-    return
-  }
-
-  var numberOfMementosLeftToChoose = numberOfMementosToChoose
-  while (numberOfMementosLeftToChoose > 0) {
-    var randomI = Math.floor(Math.random() * this.mementos.length)
-    if (!this.mementos[randomI].selected) {
-      this.mementos[randomI].selected = true
-      numberOfMementosLeftToChoose--
-    } // Duplicately selected would take an else, so it's unnecessary
-
-  }
-
-  setTimeout(function () {
-    var client = new faye.Client(notificationServer)
-    client.publish('/' + md5(_this.originalURI), {
-      'uriM': 'done'
-    })
-  }, 2000)
-
-  callback()
-}
-
-/**
-* TODO: document
-* @param callback The next procedure to execution when this process concludes
-* @param numberOfMementosToChoose The count threshold before the selection strategy has been satisfied
-*/
-TimeMap.prototype.supplyChosenMementosBasedOnTemporalInterval = function (callback, numberOfMementosToChoose) {
-  var _this = this
-  ConsoleLogIfRequired('OriginalURI is ' + _this.originalURI)
-  if (numberOfMementosToChoose > this.mementos.length) {
-    ConsoleLogIfRequired('Number to choose is greater than number existing.')
-    return
-  }
-
-  var lastMonthRecorded = -1
-
-  var selectedIndexes = [] // Maintaining memento indexes to prune
-  for (var i = 0; i < this.mementos.length; i++) {
-    var datetimeAsDate = new Date(this.mementos[i].datetime)
-    var thisYYYYMM = datetimeAsDate.getFullYear() + '' + datetimeAsDate.getMonth()
-
-    if (thisYYYYMM !== lastMonthRecorded) {
-      this.mementos[i].selected = true
-      lastMonthRecorded = thisYYYYMM
-      ConsoleLogIfRequired(this.mementos[i].datetime + ' accepted')
-      selectedIndexes.push(i)
-    } else {
-      ConsoleLogIfRequired(this.mementos[i].datetime + ' rejected (same month as previous selected)')
-    }
-  }
-
-  var beforeOK = this.mementos.filter(function (el) {
-    return el.selected !== null
-  })
-
-  ConsoleLogIfRequired('We are going to choose ' + numberOfMementosToChoose + ' --- ' + selectedIndexes)
-  // Prune based on numberOfMementosToChoose
-  while (selectedIndexes.length > numberOfMementosToChoose) {
-    var mementoIToRemove = Math.floor(Math.random() * selectedIndexes.length)
-    ConsoleLogIfRequired(selectedIndexes.length + ' is too many mementos, removing index ' + mementoIToRemove)
-    ConsoleLogIfRequired(this.mementos[mementoIToRemove].datetime + ' was ' + this.mementos[mementoIToRemove].selected)
-    delete this.mementos[selectedIndexes[mementoIToRemove]].selected
-    ConsoleLogIfRequired('Now it is ' + this.mementos[mementoIToRemove].selected)
-    selectedIndexes.splice(mementoIToRemove, 1)
-  }
-
-  var monthlyOK = this.mementos.filter(function (el) {
-    return el.selected
-  })
-
-  ConsoleLogIfRequired(beforeOK.length + ' --> ' + monthlyOK.length + ' passed the monthly test')
-
-  setTimeout(function () {
-    var client = new faye.Client(notificationServer)
-    client.publish('/' + md5(_this.originalURI), {
-      'uriM': 'done'
-    })
-  }, 2000)
-
-  callback()
-}
-
-/**
-* // Select mementos based on interval
-* @param callback The next procedure to execution when this process concludes
-* @param skipFactor Number of Mementos to skip, n=1 ==> 1,3,5,7
-* @param initialIndex The basis for the count. 0 if not supplied
-* @param numberOfMementosToChoose Artificial restriction on the count
-*/
-TimeMap.prototype.supplyChosenMementosBasedOnInterval = function (callback, skipFactor, initialIndex, numberOfMementosToChoose) {
-  var _this = this
-  if (numberOfMementosToChoose > this.mementos.length) {
-    ConsoleLogIfRequired('Number to choose is greater than number existing.')
-    return
-  }
-
-  var numberOfMementosLeftToChoose = numberOfMementosToChoose
-
-  // TODO: add further checks for parameter integrity (e.g. in case strings are passed)
-  if (!initialIndex) {
-    initialIndex = 0
-  }
-
-  if (skipFactor < 0) {
-    skipFactor = 0
-  }
-
-  for (var i = initialIndex; i < this.mementos.length; i = i + skipFactor + 1) {
-    this.mementos[i].selected = true
-  }
-
-  setTimeout(function () {
-    var client = new faye.Client(notificationServer)
-    client.publish('/' + md5(_this.originalURI), {
-      'uriM': 'done'
-    })
-  }, 2000)
-
-  callback('')
-}
 
 
 /**
@@ -1198,9 +1039,7 @@ TimeMap.prototype.createScreenshotForMemento = function (memento, callback) {
       ConsoleLogIfRequired(err)
       callback('Screenshot failed!')
     } else {
-      // if (!fs.existsSync(__dirname+"/assets/screenshots")){
-      //     fs.mkdirSync(__dirname+"/assets/screenshots");
-      // }
+
       fs.chmodSync('./'+screenshotsLocation + filename, '755')
       im.convert(['./'+screenshotsLocation + filename, '-thumbnail', '200',
             './'+screenshotsLocation + (filename.replace('.png', '_200.png'))],
